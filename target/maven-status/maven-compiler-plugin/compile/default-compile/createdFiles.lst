@@ -1,0 +1,5 @@
+com/example/pokemon/repository/PokemonRepository.class
+com/example/pokemon/PokemonApplication.class
+com/example/pokemon/entity/Battle.class
+com/example/pokemon/repository/BattleRepository.class
+com/example/pokemon/entity/Pokemon.class
