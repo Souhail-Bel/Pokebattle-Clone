@@ -18,10 +18,10 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // Only add data if the table is empty
         if (pokemonRepository.count() == 0) {
-            pokemonRepository.save(new Pokemon("Pikachu", 55, 40));
-            pokemonRepository.save(new Pokemon("Charizard", 84, 78));
-            pokemonRepository.save(new Pokemon("Bulbasaur", 49, 49));
-            pokemonRepository.save(new Pokemon("Squirtle", 48, 65));
+            pokemonRepository.save(new Pokemon("Pikachu", 55, 40,100));
+            pokemonRepository.save(new Pokemon("Charizard", 84, 78,150));
+            pokemonRepository.save(new Pokemon("Bulbasaur", 49, 49,110));
+            pokemonRepository.save(new Pokemon("Squirtle", 48, 65,120));
             System.out.println("Starter Pokemon added to the database!");
         }
     }
