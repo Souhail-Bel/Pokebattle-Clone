@@ -33,7 +33,7 @@ public class BattleController {
         Battle battle = new Battle();
         battle.setPlayer1PokemonId(p1.getId());
         battle.setPlayer2PokemonId(p2.getId());
-        
+
         battle.setPlayer1CurrentHp(p1.getHp());
         battle.setPlayer2CurrentHp(p2.getHp());
 
@@ -106,5 +106,22 @@ public class BattleController {
         }
 
         return battleRepository.save(battle); // Saves the new state back to Postgres
+    }
+
+    @PostMapping("/{id}/heal")
+    public Battle heal(@PathVariable Long id) {
+        Battle battle = battleRepository.findById(id).orElseThrow();
+        Pokemon p1 = pokemonRepository.findById(battle.getPlayer1PokemonId()).orElseThrow();
+
+        if (battle.isPlayer1Turn() && battle.getStatus() == BattleStatus.IN_PROGRESS) {
+            int amount = battleService.calculateHeal(p1);
+            battle.setPlayer1CurrentHp(Math.min(battle.getPlayer1CurrentHp() + amount, 100)); // Cap at 100 or maxHP
+
+            // Advance turn and phase
+            battle.setTurnNumber(battle.getTurnNumber() + 1);
+            battle.setPlayer1Turn(false); // End player turn
+        }
+
+        return battleRepository.save(battle);
     }
 }

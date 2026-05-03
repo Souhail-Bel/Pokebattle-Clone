@@ -2,6 +2,7 @@
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/component/DataSeeder.java
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/controller/BattleController.java
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/controller/HelloController.java
+/home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/controller/IndexController.java
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/controller/PokemonController.java
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/entity/Battle.java
 /home/loom/DATA/INSAT/GL2/Sem_2/Applications_Reparties/Pokebattle-Clone/src/main/java/com/example/pokemon/entity/BattleStatus.java

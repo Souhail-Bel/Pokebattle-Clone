@@ -1,6 +1,6 @@
 com/example/pokemon/component/DataSeeder.class
-com/example/pokemon/repository/BattleRepository.class
 com/example/pokemon/controller/BattleController.class
+com/example/pokemon/repository/BattleRepository.class
 com/example/pokemon/entity/TurnPhase.class
 com/example/pokemon/entity/BattleStatus.class
 com/example/pokemon/repository/PokemonRepository.class

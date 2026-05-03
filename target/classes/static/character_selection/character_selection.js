@@ -15,30 +15,27 @@ async function fetchCharacters() {
 
 function renderCards(list) {
   const grid = document.getElementById("character-grid");
-
-  grid.innerHTML = list
-    .map((p) => {
-      // On détermine la classe CSS selon le type (par défaut 'fire' si non trouvé)
-      const typeClass = `card-${(p.type || "fire").toLowerCase()}`;
-
-      return `
+  grid.innerHTML = list.map((p) => {
+    // On détermine la classe CSS selon le type (par défaut 'fire' si non trouvé)
+    const typeClass = `card-${(p.type || "fire").toLowerCase()}`;
+    return `
             <div class="col-6 col-md-3">
-                <div class="card pokemon-card h-100 ${typeClass}" onclick="window.selectPokemon(${p.id})">
-                    <img src="https://picsum.photos/seed/${p.nom}/200" class="card-img-top" alt="${p.nom}">
+                <div class="card pokemon-card h-100 ${typeClass}" onclick="selectPokemon(${p.id})">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png" class="card-img-top" alt="${p.name}">
                     <div class="card-body text-center p-2">
-                        <p class="pokemon-name" style="font-size: 0.7rem;">${p.nom}</p>
+                        <p class="pokemon-name" style="font-size: 0.7rem;">${p.name}</p>
                         <div class="stats-mini" style="font-size: 0.5rem; color: #ffd700;">
-                            ATK: ${p.atk} | DEF: ${p.def}
+                            ATK: ${p.attack} | DEF: ${p.defense}
                         </div>
                     </div>
                 </div>
             </div>
         `;
-    })
-    .join("");
+  }).join("");
 }
+
+// Ensure the function name is exactly selectPokemon
 function selectPokemon(pokemonId) {
-  console.log("Selected Pokemon ID:", pokemonId);
   localStorage.setItem("selectedPokemon", pokemonId);
   window.location.href = "../game/game.html";
 }

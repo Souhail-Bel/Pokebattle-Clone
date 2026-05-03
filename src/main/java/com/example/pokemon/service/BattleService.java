@@ -26,4 +26,10 @@ public class BattleService {
 
         return Math.max(damage, 1);
     }
+
+    public int calculateHeal(Pokemon pokemon) {
+        // Basic heal logic: 25% of their attack power + some base value
+        int healAmount = (pokemon.getAttack() / 2) + 10;
+        return healAmount;
+    }
 }

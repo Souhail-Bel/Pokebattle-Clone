@@ -4,21 +4,23 @@ import jakarta.persistence.*;
 
 @Entity
 public class Pokemon {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String name;
     private int attack;
     private int defense;
     private int hp;
 
     // Default constructor required by Spring JPA
-    public Pokemon() {}
+    public Pokemon() {
+    }
 
     // Constructor for creating new instances
-    public Pokemon(String name, int attack, int defense, int hp) {
+    public Pokemon(Long id, String name, int attack, int defense, int hp) {
+        this.id = id;
         this.name = name;
         this.attack = attack;
         this.defense = defense;
@@ -26,18 +28,43 @@ public class Pokemon {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public int getAttack() { return attack; }
-    public void setAttack(int attack) { this.attack = attack; }
+    public String getName() {
+        return name;
+    }
 
-    public int getDefense() { return defense; }
-    public void setDefense(int defense) { this.defense = defense; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public int getHp() {return hp;}
-    public void setHp(int hp) {this.hp = hp;}
+    public int getAttack() {
+        return attack;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+
+    public int getDefense() {
+        return defense;
+    }
+
+    public void setDefense(int defense) {
+        this.defense = defense;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
 }
