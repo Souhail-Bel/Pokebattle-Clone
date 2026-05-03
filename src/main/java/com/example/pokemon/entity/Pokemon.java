@@ -12,15 +12,17 @@ public class Pokemon {
     private String name;
     private int attack;
     private int defense;
+    private int hp;
 
     // Default constructor required by Spring JPA
     public Pokemon() {}
 
     // Constructor for creating new instances
-    public Pokemon(String name, int attack, int defense) {
+    public Pokemon(String name, int attack, int defense, int hp) {
         this.name = name;
         this.attack = attack;
         this.defense = defense;
+        this.hp = hp;
     }
 
     // Getters and Setters
@@ -35,4 +37,7 @@ public class Pokemon {
 
     public int getDefense() { return defense; }
     public void setDefense(int defense) { this.defense = defense; }
+
+    public int getHp() {return hp;}
+    public void setHp(int hp) {this.hp = hp;}
 }
