@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #000;
+    /* On force la typo Pixel partout */
+    font-family: 'Press Start 2P', cursive !important;
+    overflow: hidden;
+}
+
+/* --- EFFET ÉCRAN ANNÉES 80 --- */
+body::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 10;
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none; /* Pour pouvoir cliquer à travers */
+}
+
+/* Animation d'allumage de l'écran */
+.crt-on {
+    animation: turn-on 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes turn-on {
+    0% { transform: scale(1, 0.8) translate3d(0, 0, 0); opacity: 0; }
+    100% { transform: scale(1, 1) translate3d(0, 0, 0); opacity: 1; }
+}
+
+/* --- LAYOUT & CENTRAGE --- */
+.border-blue-frame {
+    border: 15px solid #0044ff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centre verticalement */
+    align-items: center;     /* Centre horizontalement */
+    box-sizing: border-box;
+}
+
+.game-logo {
+    /* Changement : Utilise la police Pixel au lieu d'Arial */
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 3.5rem; /* Réduit un peu car la police pixel est large */
+    text-align: center;
+    background: linear-gradient(to bottom, #fff200 0%, #ff0000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(4px 4px 0px #000);
+    margin-bottom: 50px;
+}
+
+.btn-arcade {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 1.5rem;
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s;
+}
+
+.btn-arcade:hover {
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
+}
+
+.cursor {
+    animation: blink 3s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; }
+}
