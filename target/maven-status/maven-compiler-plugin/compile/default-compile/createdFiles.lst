@@ -1,8 +1,13 @@
-com/example/pokemon/repository/PokemonRepository.class
-com/example/pokemon/entity/Battle.class
 com/example/pokemon/component/DataSeeder.class
-com/example/pokemon/controller/BattleController.class
 com/example/pokemon/repository/BattleRepository.class
+com/example/pokemon/controller/BattleController.class
+com/example/pokemon/entity/TurnPhase.class
+com/example/pokemon/entity/BattleStatus.class
+com/example/pokemon/repository/PokemonRepository.class
+com/example/pokemon/service/BattleService.class
+com/example/pokemon/entity/Battle.class
+com/example/pokemon/controller/BattleController$1.class
 com/example/pokemon/entity/Pokemon.class
 com/example/pokemon/PokemonApplication.class
 com/example/pokemon/controller/PokemonController.class
+com/example/pokemon/controller/HelloController.class
