@@ -1,0 +1,20 @@
+# Dépendances Node
+node_modules/
+npm-debug.log*
+
+# Build et compilation (Backend & Frontend)
+target/
+dist/
+.gradle/
+build/
+
+# IDE et Configuration (VS Code, IntelliJ)
+.idea/
+.vscode/
+*.swp
+*.iml
+*.iws
+
+# Divers
+.DS_Store
+Thumbs.db

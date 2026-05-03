@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Poké-Battle - Combat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="game.css">
+</head>
+<body class="bg-black text-white crt-on">
+
+    <div class="container-fluid border-blue-frame vh-100 d-flex flex-column justify-content-between py-4">
+        
+        <!-- HUD : Barres de vie -->
+        <div class="row w-100 justify-content-center px-lg-5">
+            <div class="col-5">
+                <div class="health-label">PLAYER 1</div>
+                <div class="progress health-bar-container">
+                    <div id="p1-health" class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="col-2 text-center timer-style">99</div>
+            <div class="col-5">
+                <div class="health-label text-end">ENEMY</div>
+                <div class="progress health-bar-container flex-row-reverse">
+                    <div id="p2-health" class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de Combat -->
+        <div class="battle-arena d-flex justify-content-around align-items-center">
+            <div id="player-container" class="sprite-container">
+                <div id="player-name-tag" class="name-tag">MANDO</div>
+                <img src="https://picsum.photos/seed/mando/200" id="player-img" class="sprite shadow-player">
+            </div>
+
+            <div id="enemy-container" class="sprite-container">
+                <div id="enemy-name-tag" class="name-tag">GOLEM</div>
+                <img src="https://picsum.photos/seed/golem/200" id="enemy-img" class="sprite shadow-enemy enemy-flip">
+            </div>
+        </div>
+
+        <!-- Contrôles -->
+        <div class="action-menu text-center pb-5">
+            <button id="attack-btn" class="btn-arcade-action mx-2">ATTACK</button>
+            <button id="heal-btn" class="btn-arcade-action mx-2 heal-style">HEAL</button>
+            <div id="battle-log" class="mt-3 text-warning" style="font-size: 0.7rem;">READY TO FIGHT!</div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

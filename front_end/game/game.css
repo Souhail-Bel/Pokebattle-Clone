@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    font-family: 'Press Start 2P', cursive !important;
+    overflow: hidden;
+    background: #000;
+}
+
+.border-blue-frame {
+    border: 12px solid #0044ff;
+    box-sizing: border-box;
+}
+
+/* --- HUD --- */
+.health-bar-container {
+    height: 25px;
+    background-color: #333;
+    border: 3px solid #fff;
+    border-radius: 0;
+}
+
+.health-label {
+    font-size: 0.8rem;
+    color: #ffd700;
+    margin-bottom: 8px;
+}
+
+.timer-style {
+    font-size: 2rem;
+    color: #ff0000;
+    text-shadow: 2px 2px #fff;
+}
+
+/* --- ARENA --- */
+.sprite {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.enemy-flip { transform: scaleX(-1); }
+
+.name-tag {
+    font-size: 0.6rem;
+    background: rgba(0,0,0,0.7);
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #fff;
+    margin-bottom: 10px;
+}
+
+/* --- ANIMATIONS --- */
+.shake {
+    animation: shake-anim 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake-anim {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
+}
+
+/* --- BOUTONS --- */
+.btn-arcade-action {
+    background: #000;
+    border: 4px solid #fff;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    padding: 15px 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.btn-arcade-action:hover {
+    background: #ff0000;
+    border-color: #ffd700;
+}
+
+.heal-style { color: #00ff00; }
+.heal-style:hover { background: #008000; }
