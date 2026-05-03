@@ -1,4 +1,7 @@
 /home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/PokemonApplication.java
+/home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/component/DataSeeder.java
+/home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/controller/BattleController.java
+/home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/controller/PokemonController.java
 /home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/entity/Battle.java
 /home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/entity/Pokemon.java
 /home/talel/Programming/Java/application_rep/project/src/main/java/com/example/pokemon/repository/BattleRepository.java
