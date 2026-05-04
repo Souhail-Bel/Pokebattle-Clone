@@ -1,141 +1,114 @@
 let currentBattleId = null;
+let myPokemonId = localStorage.getItem('selectedPokemon');
+let myRole = null;
 let p1MaxHp = 100;
 let p2MaxHp = 100;
+let uiInitialized = false;
 
 const log = document.getElementById('battle-log');
 const attackBtn = document.getElementById('attack-btn');
-const healBtn = document.getElementById('heal-btn'); // Ensure your HTML has id="heal-btn"
+const healBtn = document.getElementById('heal-btn');
 
+// 1. Initialize Battle on Load
+async function initBattle() {
+    // Join or Create a battle
+    const response = await fetch(`/api/battle/join?pokemonId=${myPokemonId}`, { method: 'POST' });
+    const battle = await response.json();
+
+    currentBattleId = battle.id;
+
+    // Start polling the server every 1.5 seconds
+    setInterval(pollUpdate, 1500);
+}
+
+// 2. Action: Attack
+async function attack() {
+    disableControls(true);
+    // Note: We append ?playerId= to prove to the backend who is attacking
+    const response = await fetch(`/api/battle/${currentBattleId}/attack?playerId=${myPokemonId}`, { method: 'POST' });
+    const battle = await response.json();
+
+    updateUI(battle);
+    animateImpact(myRole === 'P1' ? 'enemy-container' : 'player-container');
+    // We do NOT call enemyTurn() here. pollUpdate() handles the turn swap.
+}
+
+// 3. Action: Heal
 async function heal() {
-    attackBtn.disabled = true;
-    healBtn.disabled = true;
+    disableControls(true);
     log.innerHTML = `<p>Healing...</p>`;
 
     try {
-        const response = await fetch(`/api/battle/${currentBattleId}/heal`, { method: 'POST' });
+        // Note: We append ?playerId= to prove to the backend who is healing
+        const response = await fetch(`/api/battle/${currentBattleId}/heal?playerId=${myPokemonId}`, { method: 'POST' });
         const battle = await response.json();
-        
+
         updateUI(battle);
         log.innerHTML = `<p>You felt better!</p>`;
-
-        // After healing, it's the enemy's turn
-        setTimeout(enemyTurn, 1000);
+        // We do NOT call enemyTurn() here. pollUpdate() handles the turn swap.
     } catch (error) {
         console.error("Heal failed:", error);
     }
 }
 
-healBtn.addEventListener('click', heal);
+// 4. Polling Logic (The heartbeat of multiplayer)
+async function pollUpdate() {
+    if (!currentBattleId) return;
 
-// 1. Initialize Battle on Load
-async function initBattle() {
-    try {
-        // 1. Fetch all available pokemon first
-        const pokeResponse = await fetch('/api/pokemon');
-        const allPokemon = await pokeResponse.json();
+    const response = await fetch(`/api/battle/${currentBattleId}`);
+    const battle = await response.json();
 
-        if (allPokemon.length < 2) {
-            log.innerHTML = "NOT ENOUGH POKEMON IN DATABASE";
-            return;
-        }
+    // Setup UI the moment Player 2 joins
+    if (!uiInitialized && battle.player2PokemonId) {
+        await setupStaticUI(battle);
+    }
 
-        // 2. Get Player 1 ID from selection (fallback to first in list)
-        const p1Id = localStorage.getItem('selectedPokemon') || allPokemon[0].id;
-        
-        // 3. Pick a random opponent (p2) that isn't the player
-        const opponents = allPokemon.filter(p => p.id != p1Id);
-        const randomOpponent = opponents[Math.floor(Math.random() * opponents.length)] || allPokemon[0];
-        const p2Id = randomOpponent.id;
+    updateUI(battle);
 
-        // 4. Start the battle on the backend
-        const battleResponse = await fetch(`/api/battle/start?p1Id=${p1Id}&p2Id=${p2Id}`, { method: 'POST' });
-        
-        if (!battleResponse.ok) {
-            throw new Error("Backend failed to start battle. Check if IDs exist.");
-        }
-        
-        const battle = await battleResponse.json();
+    // ENABLE buttons only if it is YOUR turn
+    const isMyTurn = (myRole === 'P1' && battle.player1Turn) ||
+        (myRole === 'P2' && !battle.player1Turn);
 
-        // 5. Update UI State
-        currentBattleId = battle.id;
-        p1MaxHp = battle.player1CurrentHp;
-        p2MaxHp = battle.player2CurrentHp;
+    const isGameOver = battle.status === 'FINISHED';
 
-        // Find the full pokemon objects for names and images
-        const p1 = allPokemon.find(p => p.id == p1Id);
-        const p2 = allPokemon.find(p => p.id == p2Id);
-
-        document.getElementById('player-name-tag').innerText = p1.name;
-        document.getElementById('enemy-name-tag').innerText = p2.name;
-        document.getElementById('player-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p1.id}.png`;
-        document.getElementById('enemy-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p2.id}.png`;
-
-        log.innerHTML = `A wild ${p2.name} appeared!`;
-        updateUI(battle);
-
-    } catch (error) {
-        console.error("Battle Init Error:", error);
-        log.innerHTML = "SYSTEM ERROR: Check Backend Logs";
+    if (battle.status === 'WAITING') {
+        log.innerHTML = "Waiting for Player 2...";
+        disableControls(true);
+    } else if (isGameOver) {
+        endGame(battle);
+    } else {
+        disableControls(!isMyTurn);
+        log.innerHTML = isMyTurn ? "YOUR TURN!" : "Opponent is thinking...";
     }
 }
 
-// 2. Helper function to call the backend /attack endpoint
-async function executePhase() {
-    const response = await fetch(`/api/battle/${currentBattleId}/attack`, { method: 'POST' });
-    return await response.json();
+// 5. One-time Setup for Sprites and Names
+async function setupStaticUI(battle) {
+    const p1 = await (await fetch(`/api/pokemon`)).json().then(list => list.find(p => p.id == battle.player1PokemonId));
+    const p2 = await (await fetch(`/api/pokemon`)).json().then(list => list.find(p => p.id == battle.player2PokemonId));
+
+    myRole = (battle.player1PokemonId == myPokemonId) ? 'P1' : 'P2';
+    p1MaxHp = p1.hp;
+    p2MaxHp = p2.hp;
+
+    const myPokemon = myRole === 'P1' ? p1 : p2;
+    const enemyPokemon = myRole === 'P1' ? p2 : p1;
+    document.getElementById('player-name-tag').innerText = myPokemon.name;
+    document.getElementById('enemy-name-tag').innerText = enemyPokemon.name;
+    document.getElementById('player-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${myPokemon.id}.png`;
+    document.getElementById('enemy-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${enemyPokemon.id}.png`;
+
+    document.getElementById('player-container').style.visibility = 'visible';
+    document.getElementById('enemy-container').style.visibility = 'visible';
+    uiInitialized = true;
 }
 
-// 3. Player Attack Action
-async function attack() {
-    attackBtn.disabled = true;
-    log.innerHTML = `<p>Attacking...</p>`;
-    let battle;
-
-    try {
-        // Loop through START -> PLAYER_ACTION -> RESOLUTION -> END
-        do {
-            battle = await executePhase();
-            updateUI(battle);
-        } while (battle.phase !== 'END' && battle.status !== 'FINISHED');
-
-        animateImpact('enemy-container');
-
-        // If the battle isn't over, trigger the enemy's turn
-        if (battle.status !== 'FINISHED') {
-            setTimeout(enemyTurn, 1000);
-        } else {
-            endGame(battle);
-        }
-    } catch (error) {
-        console.error("Attack failed:", error);
-    }
+// 6. Helpers & UI Updates
+function disableControls(disabled) {
+    attackBtn.disabled = disabled;
+    healBtn.disabled = disabled;
 }
 
-// 4. Enemy Turn Action
-async function enemyTurn() {
-    log.innerHTML = `<p>Enemy is attacking...</p>`;
-    let battle;
-
-    try {
-        do {
-            battle = await executePhase();
-            updateUI(battle);
-        } while (battle.phase !== 'END' && battle.status !== 'FINISHED');
-
-        animateImpact('player-container');
-
-        if (battle.status !== 'FINISHED') {
-            log.innerHTML = `<p>Your turn!</p>`;
-            attackBtn.disabled = false;
-        } else {
-            endGame(battle);
-        }
-    } catch (error) {
-        console.error("Enemy attack failed:", error);
-    }
-}
-
-// 5. Update UI with Backend Data
 function updateUI(battle) {
     const p1bar = document.getElementById("p1-health");
     const p2bar = document.getElementById("p2-health");
@@ -146,26 +119,34 @@ function updateUI(battle) {
     p1bar.style.width = p1Percentage + '%';
     p2bar.style.width = p2Percentage + '%';
 
-
     if (p1Percentage < 30) p1bar.classList.replace('bg-success', 'bg-danger');
+    else p1bar.classList.replace('bg-danger', 'bg-success'); // Added to fix color if healed above 30%
+
     if (p2Percentage < 30) p2bar.classList.replace('bg-success', 'bg-danger');
+    else p2bar.classList.replace('bg-danger', 'bg-success'); // Added to fix color if healed above 30%
 }
 
-// 6. Animations and Cleanup
 function animateImpact(containerId) {
     const container = document.getElementById(containerId);
-    container.classList.add("shake");
-    setTimeout(() => container.classList.remove("shake"), 500);
+    if (container) {
+        container.classList.add("shake");
+        setTimeout(() => container.classList.remove("shake"), 500);
+    }
 }
 
 function endGame(battle) {
-    const won = battle.player1CurrentHp > 0;
-    log.innerHTML = won ? "<p>YOU WIN!</p>" : "<p>GAME OVER...</p>";
+    disableControls(true);
+    // Determine winner based on role and HP
+    const p1Won = battle.player2CurrentHp <= 0;
+    const iWon = (myRole === 'P1' && p1Won) || (myRole === 'P2' && !p1Won);
+
+    log.innerHTML = iWon ? "<p>YOU WIN!</p>" : "<p>GAME OVER...</p>";
     setTimeout(() => window.location.href = "../menu/menu.html", 3000);
 }
 
 // Event Listeners
 attackBtn.addEventListener('click', attack);
+healBtn.addEventListener('click', heal);
 
 // Kick off the battle
 initBattle();
