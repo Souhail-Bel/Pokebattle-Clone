@@ -141,4 +141,13 @@ public class BattleController {
 
         return battleRepository.save(battle);
     }
+
+    @PostMapping("/{id}/abandon")
+    public void abandonBattle(@PathVariable Long id) {
+        Battle battle = battleRepository.findById(id).orElseThrow();
+        if (battle.getStatus() != BattleStatus.FINISHED) {
+            battle.setStatus(BattleStatus.FINISHED);
+            battleRepository.save(battle);
+        }
+    }
 }

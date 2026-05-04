@@ -4,6 +4,10 @@ let myRole = null;
 let p1MaxHp = 100;
 let p2MaxHp = 100;
 let uiInitialized = false;
+let timerInterval = null;
+let timeLeft = 30;
+
+let isMyTurnActive = false;
 
 const log = document.getElementById('battle-log');
 const attackBtn = document.getElementById('attack-btn');
@@ -11,13 +15,12 @@ const healBtn = document.getElementById('heal-btn');
 
 // 1. Initialize Battle on Load
 async function initBattle() {
-    // Join or Create a battle
     const response = await fetch(`/api/battle/join?pokemonId=${myPokemonId}`, { method: 'POST' });
     const battle = await response.json();
-
     currentBattleId = battle.id;
-
-    // Start polling the server every 1.5 seconds
+    // P1 just created the room → player2 slot is still empty
+    // P2 just filled the room → both slots are set
+    myRole = (battle.player2PokemonId == null) ? 'P1' : 'P2';
     setInterval(pollUpdate, 1500);
 }
 
@@ -78,7 +81,18 @@ async function pollUpdate() {
         endGame(battle);
     } else {
         disableControls(!isMyTurn);
-        log.innerHTML = isMyTurn ? "YOUR TURN!" : "Opponent is thinking...";
+        if (isMyTurn) {
+            log.innerHTML = "YOUR TURN!";
+            if (!isMyTurnActive) {   // only start timer once per turn
+                isMyTurnActive = true;
+                startTurnTimer();
+            }
+        } else {
+            isMyTurnActive = false;
+            clearInterval(timerInterval);
+            document.querySelector('.timer-style').textContent = '–';
+            log.innerHTML = "Opponent is thinking...";
+        }
     }
 }
 
@@ -93,8 +107,9 @@ async function setupStaticUI(battle) {
 
     const myPokemon = myRole === 'P1' ? p1 : p2;
     const enemyPokemon = myRole === 'P1' ? p2 : p1;
-    document.getElementById('player-name-tag').innerText = myPokemon.name;
-    document.getElementById('enemy-name-tag').innerText = enemyPokemon.name;
+    const enemyRole = myRole === 'P1' ? 'P2' : 'P1';
+    document.getElementById('player-name-tag').innerText = `[YOU - ${myRole}] ${myPokemon.name}`;
+    document.getElementById('enemy-name-tag').innerText = `[${enemyRole}] ${enemyPokemon.name}`;
     document.getElementById('player-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${myPokemon.id}.png`;
     document.getElementById('enemy-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${enemyPokemon.id}.png`;
 
@@ -136,17 +151,45 @@ function animateImpact(containerId) {
 
 function endGame(battle) {
     disableControls(true);
-    // Determine winner based on role and HP
     const p1Won = battle.player2CurrentHp <= 0;
-    const iWon = (myRole === 'P1' && p1Won) || (myRole === 'P2' && !p1Won);
+    const opponentQuit = battle.player1CurrentHp > 0 && battle.player2CurrentHp > 0;
 
-    log.innerHTML = iWon ? "<p>YOU WIN!</p>" : "<p>GAME OVER...</p>";
+    let message;
+    if (opponentQuit) {
+        message = "<p>OPPONENT QUIT. YOU WIN!</p>";
+    } else {
+        const iWon = (myRole === 'P1' && p1Won) || (myRole === 'P2' && !p1Won);
+        message = iWon ? "<p>YOU WIN!</p>" : "<p>GAME OVER...</p>";
+    }
+    log.innerHTML = message;
     setTimeout(() => window.location.href = "../menu/menu.html", 3000);
+}
+
+function startTurnTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 30;
+    document.querySelector('.timer-style').textContent = timeLeft;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.querySelector('.timer-style').textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            // Auto-attack when time runs out
+            attack();
+        }
+    }, 1000);
 }
 
 // Event Listeners
 attackBtn.addEventListener('click', attack);
 healBtn.addEventListener('click', heal);
+
+window.addEventListener('beforeunload', () => {
+    if (currentBattleId) {
+        navigator.sendBeacon(`/api/battle/${currentBattleId}/abandon`);
+    }
+});
 
 // Kick off the battle
 initBattle();
